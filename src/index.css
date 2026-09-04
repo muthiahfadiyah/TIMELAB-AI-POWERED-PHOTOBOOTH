@@ -1,0 +1,311 @@
+/* src/index.css */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-gff: "GFF Latin", "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* GFF Latin — used only on user-facing kiosk pages (Photobooth, PasswordGate,
+   ShareView), never the admin panel. Loaded via .font-gff applied at the
+   route wrapper, not via --font-sans, so it doesn't leak into Admin. */
+@font-face {
+  font-family: "GFF Latin";
+  src:
+    url("./assets/gff-latin/GFF-Latin-Thin.woff2") format("woff2"),
+    url("./assets/gff-latin/GFF-Latin-Thin.woff") format("woff");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GFF Latin";
+  src:
+    url("./assets/gff-latin/GFF-Latin-Regular.woff2") format("woff2"),
+    url("./assets/gff-latin/GFF-Latin-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GFF Latin";
+  src:
+    url("./assets/gff-latin/GFF-Latin-Medium.woff2") format("woff2"),
+    url("./assets/gff-latin/GFF-Latin-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "GFF Latin";
+  src:
+    url("./assets/gff-latin/GFF-Latin-Bold.woff2") format("woff2"),
+    url("./assets/gff-latin/GFF-Latin-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  body {
+    @apply bg-[#020205] text-white selection:bg-[#D32A30]/30 overflow-x-hidden;
+  }
+}
+
+@layer components {
+  .font-gff {
+    font-family: var(--font-gff);
+  }
+
+  .glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-[24px] border border-white/[0.08];
+  }
+
+  .mesh-bg {
+    @apply fixed inset-0 -z-10 pointer-events-none;
+    background:
+      radial-gradient(
+        circle at 20% 30%,
+        rgba(65, 105, 225, 0.1) 0%,
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 80% 70%,
+        rgba(138, 43, 226, 0.1) 0%,
+        transparent 40%
+      ),
+      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 1) 0%, transparent 100%);
+  }
+
+  .scanline {
+    @apply absolute left-0 right-0 h-0.5 pointer-events-none;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(99, 102, 241, 0.5),
+      transparent
+    );
+    animation: scan 3s linear infinite;
+  }
+
+  /* Hides the scrollbar visually while keeping the element scrollable
+     (mouse wheel, touch, drag, keyboard) — used for the style grid view. */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Sharp "notch" shapes — user-facing pages only, replaces rounded-* on
+     buttons with a chamfered silhouette (single cut, bottom-right corner
+     only — the other three stay sharp 90° corners). Pair `.notch` with one
+     size modifier on the same element. */
+  .notch {
+    --notch: 10px;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - var(--notch)),
+      calc(100% - var(--notch)) 100%,
+      0 100%
+    );
+  }
+  .notch-xs {
+    --notch: 5px;
+  }
+  .notch-sm {
+    --notch: 8px;
+  }
+  .notch-md {
+    --notch: 12px;
+  }
+  .notch-lg {
+    --notch: 18px;
+  }
+  .notch-xl {
+    --notch: 26px;
+  }
+
+  /* Two-corner chamfer — top-left AND bottom-right cut, the other two
+     stay sharp 90°. Mirrors the "char-item" card from the reference UI
+     kit. Pair with a notch-* size modifier (they only set --notch, so
+     they work with either this or the single-corner `.notch` shape). */
+  .notch-2 {
+    --notch: 16px;
+    clip-path: polygon(
+      var(--notch) 0,
+      100% 0,
+      100% calc(100% - var(--notch)),
+      calc(100% - var(--notch)) 100%,
+      0 100%,
+      0 var(--notch)
+    );
+  }
+
+  /* Card cut — bigger two-corner notch (top-left + bottom-right) for
+     selection cards, with a border that wraps the WHOLE silhouette
+     including both diagonal edges. A plain CSS `border` can't follow a
+     clip-path edge (it gets sliced away at the cut with no replacement
+     stroke), so this fakes it with two layers: ::before is a true RING
+     (an outer notched hexagon with a smaller notched hexagon cut out of
+     its middle via `evenodd`, so its center is genuinely transparent —
+     not just covered by a translucent layer on top of an opaque one,
+     which is what made an earlier version of this look like a solid
+     fill instead of glass) and ::after is the inset interior surface,
+     translucent so it tints whatever is truly behind the card (matches
+     how a plain `bg-blue-500/15 border-blue-400` button looks elsewhere
+     in the app). Colors are CSS custom properties so each call site can
+     recolor per state (e.g. a category's own accent color when selected)
+     by setting them inline, without new CSS rules. No hover filter here
+     on purpose — relies on the same whileHover scale every selection card
+     already uses, so hover feel stays consistent across steps. */
+  .card-cut {
+    --notch: 44px;
+    --card-border-w: 2px;
+    /* Erosion math for a 45° chamfer: offsetting a diagonal edge inward by
+       `b` (perpendicular distance) shifts it by `b*sqrt(2)` along x+y, while
+       the two straight edges it meets only shift by `b`. Net reduction in
+       notch length is b*(2-sqrt(2)) ≈ b*0.586 — using sqrt(2) (≈1.42) here
+       instead made the diagonal segment of the ring a different width than
+       the straight segments. */
+    --notch-inner: calc(var(--notch) - var(--card-border-w) * 0.586);
+    --card-border-color: rgba(255, 255, 255, 0.5);
+    --card-bg-color: rgba(255, 255, 255, 0.07);
+    position: relative;
+    isolation: isolate;
+    background: transparent;
+    clip-path: polygon(
+      var(--notch) 0,
+      100% 0,
+      100% calc(100% - var(--notch)),
+      calc(100% - var(--notch)) 100%,
+      0 100%,
+      0 var(--notch)
+    );
+  }
+  .card-cut::before,
+  .card-cut::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    transition: background-color 0.2s;
+  }
+  .card-cut::before {
+    inset: 0;
+    z-index: -2;
+    background: var(--card-border-color);
+    /* `polygon()` only ever draws ONE continuous path — listing an outer
+       loop then an inner loop doesn't give two independent shapes, it adds
+       a connector edge from the outer loop's last point to the inner
+       loop's first point, then (implicitly) another connector closing the
+       inner loop's last point back to the very first point overall. Those
+       two connectors are different edges; right where they don't sit on
+       top of each other, evenodd leaves a stray sliver — that's what was
+       showing up as an uneven stroke at one corner. Repeating each loop's
+       start point at its own end forces both connectors onto the exact
+       same line (traversed forward, then backward), so they cancel to
+       zero width instead of leaving a sliver. */
+    clip-path: polygon(
+      evenodd,
+      /* outer notched hexagon, explicitly closed back to its own start */
+      var(--notch) 0,
+      100% 0,
+      100% calc(100% - var(--notch)),
+      calc(100% - var(--notch)) 100%,
+      0 100%,
+      0 var(--notch),
+      var(--notch) 0,
+      /* inner hole, explicitly closed back to its own start — leaves only
+         a `--card-border-w` ring opaque */
+      calc(var(--card-border-w) + var(--notch-inner)) var(--card-border-w),
+      calc(100% - var(--card-border-w)) var(--card-border-w),
+      calc(100% - var(--card-border-w))
+        calc(100% - var(--card-border-w) - var(--notch-inner)),
+      calc(100% - var(--card-border-w) - var(--notch-inner))
+        calc(100% - var(--card-border-w)),
+      var(--card-border-w) calc(100% - var(--card-border-w)),
+      var(--card-border-w) calc(var(--card-border-w) + var(--notch-inner)),
+      calc(var(--card-border-w) + var(--notch-inner)) var(--card-border-w)
+    );
+  }
+  .card-cut::after {
+    inset: var(--card-border-w);
+    z-index: -1;
+    background-color: var(--card-bg-color);
+    /* Light sweep — same idea as .btn-sharp's hover shine, but ::before/
+       ::after are both already spoken for by the border-ring technique
+       above, so the streak rides as a second background layer on ::after
+       instead of a dedicated pseudo-element, animated via background-
+       position rather than transform. */
+    background-image: linear-gradient(
+      115deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 65%
+    );
+    background-size: 220% 220%;
+    background-position: -120% -120%;
+    background-repeat: no-repeat;
+    clip-path: polygon(
+      var(--notch-inner) 0,
+      100% 0,
+      100% calc(100% - var(--notch-inner)),
+      calc(100% - var(--notch-inner)) 100%,
+      0 100%,
+      0 var(--notch-inner)
+    );
+    transition:
+      background-color 0.2s,
+      background-position 0.6s ease;
+  }
+  .card-cut:hover::after {
+    background-position: 120% 120%;
+  }
+
+  /* Button sweep — pairs with .notch. Deliberately doesn't touch
+     transform/letter-spacing: several buttons already animate those via
+     Tailwind hover: utilities or framer-motion whileHover, and a second
+     transform here would just fight them instead of stacking. The light
+     sweep is a new pseudo-element layer so it composes cleanly with
+     whatever motion already exists on a given button. */
+  .btn-sharp {
+    position: relative;
+    isolation: isolate;
+  }
+  .btn-sharp::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 60%
+    );
+    transform: translateX(-130%) skewX(-15deg);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .btn-sharp:hover::after {
+    transform: translateX(130%) skewX(-15deg);
+  }
+  .btn-sharp:disabled::after,
+  .btn-sharp[disabled]::after {
+    display: none;
+  }
+}
+
+@keyframes scan {
+  0% {
+    top: 0%;
+  }
+  100% {
+    top: 100%;
+  }
+}

@@ -1,0 +1,52 @@
+@font-face {
+    font-family: 'GFF Latin';
+    src: url('GFF-Latin-Thin.eot');
+    src: local('GFF Latin Thin'), local('GFF-Latin-Thin'),
+        url('GFF-Latin-Thin.eot?#iefix') format('embedded-opentype'),
+        url('GFF-Latin-Thin.woff2') format('woff2'),
+        url('GFF-Latin-Thin.woff') format('woff'),
+        url('GFF-Latin-Thin.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'GFF Latin';
+    src: url('GFF-Latin-Bold.eot');
+    src: local('GFF Latin Bold'), local('GFF-Latin-Bold'),
+        url('GFF-Latin-Bold.eot?#iefix') format('embedded-opentype'),
+        url('GFF-Latin-Bold.woff2') format('woff2'),
+        url('GFF-Latin-Bold.woff') format('woff'),
+        url('GFF-Latin-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'GFF Latin';
+    src: url('GFF-Latin-Regular.eot');
+    src: local('GFF Latin Regular'), local('GFF-Latin-Regular'),
+        url('GFF-Latin-Regular.eot?#iefix') format('embedded-opentype'),
+        url('GFF-Latin-Regular.woff2') format('woff2'),
+        url('GFF-Latin-Regular.woff') format('woff'),
+        url('GFF-Latin-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'GFF Latin';
+    src: url('GFF-Latin-Medium.eot');
+    src: local('GFF Latin Medium'), local('GFF-Latin-Medium'),
+        url('GFF-Latin-Medium.eot?#iefix') format('embedded-opentype'),
+        url('GFF-Latin-Medium.woff2') format('woff2'),
+        url('GFF-Latin-Medium.woff') format('woff'),
+        url('GFF-Latin-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+

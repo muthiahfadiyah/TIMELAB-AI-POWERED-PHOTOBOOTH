@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+!print-bridge/dist/
+print-bridge/build/
+print-bridge/**/build/
+print-bridge/*.spec
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Uploaded files
+uploads/
+
+# Logs
+*.log
+npm-debug.log*
